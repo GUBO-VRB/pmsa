@@ -26,6 +26,20 @@ The repo encodes a three-stage flow from idea to code. Follow it rather than jum
 
 `docs/architecture/` holds an arc42 skeleton (sections 01–12, currently empty templates). Specs are meant to *reference* these sections rather than duplicate them: project-wide quality requirements belong in `10-quality-requirements.md`, per-feature NFRs in the spec. Fill in the relevant arc42 section when an architectural decision is made, and log it in `09-architecture-decisions.md`.
 
+## Issue tracking
+
+Issues live in **https://github.com/GUBO-VRB/pmsa** (`owner: GUBO-VRB`, `repo: pmsa`). That is the only repository to touch — never infer a different one from the local remote or the working directory.
+
+Always go through the **github MCP server** for issue work; this overrides the general guidance to reach for the `gh` CLI. The relevant tools:
+
+- `mcp__github__issue_write` — create (`method: "create"`) and update (`method: "update"`)
+- `mcp__github__issue_read` — fetch a single issue
+- `mcp__github__list_issues` / `mcp__github__search_issues` — browse and search; search first to avoid duplicates
+- `mcp__github__add_issue_comment` — comment
+- `mcp__github__sub_issue_write` — parent/child links
+
+Set `state_reason` whenever closing an issue. Creating or commenting on an issue is outward-facing — confirm with the user first unless they asked for it in the current turn.
+
 ## Conventions
 
 - Root namespace is `pmsa` (lowercase); page models live in `pmsa.Pages`.
