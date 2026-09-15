@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\pmsa\\pmsa\\pmsa.csproj": {}
+    "C:\\PMSA\\pmsa\\pmsa.csproj": {}
   },
   "projects": {
-    "C:\\pmsa\\pmsa\\pmsa.csproj": {
+    "C:\\PMSA\\pmsa\\pmsa.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\pmsa\\pmsa\\pmsa.csproj",
+        "projectUniqueName": "C:\\PMSA\\pmsa\\pmsa.csproj",
         "projectName": "pmsa",
-        "projectPath": "C:\\pmsa\\pmsa\\pmsa.csproj",
+        "projectPath": "C:\\PMSA\\pmsa\\pmsa.csproj",
         "packagesPath": "C:\\Users\\cursist-iobdp45x\\.nuget\\packages\\",
-        "outputPath": "C:\\pmsa\\pmsa\\obj\\",
+        "outputPath": "C:\\PMSA\\pmsa\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
