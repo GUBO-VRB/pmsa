@@ -1,0 +1,209 @@
+@page
+@using System.Globalization
+@using pmsa.Reporting
+@model pmsa.Pages.Reports.ProjectsModel
+@{
+    ViewData["Title"] = "Hours per project";
+
+    // The longest bar fills the track, so a report holding one project draws a full-width bar
+    // rather than a degenerate one (EC-9).
+    var chartSlices = Model.Result?.ChartSlices ?? [];
+    var widest = chartSlices.Count == 0 ? 1 : chartSlices.Max(slice => slice.Minutes);
+}
+
+<h1 class="h3 mb-3">Hours per project</h1>
+
+@*
+    A GET form: the address *is* the report (FR-018), so applying a filter has to be a navigation
+    rather than a post. Each preset is its own submit button, which means the clicked one is the
+    only `preset` sent — a custom range typed into the date inputs is therefore never overridden
+    by a preset left selected from last time.
+*@
+<form method="get" class="card card-body bg-light mb-4" id="report-filter">
+    <div class="mb-3">
+        <div class="form-label" id="preset-label">Range</div>
+        <div class="btn-group flex-wrap" role="group" aria-labelledby="preset-label">
+            @foreach (var preset in DateRangePresets.All.Where(p => p != DateRangePreset.Custom))
+            {
+                var isCurrent = Model.Preset == preset;
+                <button type="submit" name="preset" value="@preset"
+                        class="btn btn-sm @(isCurrent ? "btn-primary" : "btn-outline-secondary")"
+                        aria-pressed="@(isCurrent ? "true" : "false")">
+                    @preset.Label()
+                </button>
+            }
+        </div>
+    </div>
+
+    <div class="row g-3 align-items-end">
+        <div class="col-sm-3">
+            <label class="form-label" for="from">Begin date</label>
+            <input class="form-control" type="date" id="from" name="from"
+                   value="@(Model.Range?.Begin.ToString("yyyy-MM-dd"))" required />
+        </div>
+        <div class="col-sm-3">
+            <label class="form-label" for="to">End date</label>
+            <input class="form-control" type="date" id="to" name="to"
+                   value="@(Model.Range?.End.ToString("yyyy-MM-dd"))" required />
+        </div>
+
+        @if (Model.ShowPersonFilter)
+        {
+            @* FR-015: offered to Manager and Admin only. For a User this block is absent from the
+               markup entirely, not disabled (SC-010). *@
+            <div class="col-sm-3">
+                <label class="form-label" for="person">People</label>
+                <select class="form-select" id="person" name="person" multiple size="5"
+                        aria-describedby="person-help">
+                    @foreach (var option in Model.Options.People)
+                    {
+                        <option value="@option.Id" selected="@Model.SelectedPersonIds.Contains(option.Id)">
+                            @option.Label@(option.IsActive ? null : " (deactivated)")
+                        </option>
+                    }
+                </select>
+                <div class="form-text" id="person-help">Select none for everybody.</div>
+            </div>
+        }
+
+        <div class="col-sm-3">
+            <label class="form-label" for="project">Projects</label>
+            <select class="form-select" id="project" name="project" multiple size="5"
+                    aria-describedby="project-help">
+                @foreach (var option in Model.Options.Projects)
+                {
+                    <option value="@option.Id" selected="@Model.SelectedProjectIds.Contains(option.Id)">
+                        @option.Label@(option.IsActive ? null : " (archived)")
+                    </option>
+                }
+            </select>
+            <div class="form-text" id="project-help">Select none for all of them.</div>
+        </div>
+    </div>
+
+    <div class="mt-3 d-flex gap-2 align-items-center">
+        @* No name, so this button sends no preset and the typed dates decide the range. *@
+        <button type="submit" class="btn btn-primary">Apply</button>
+        <a class="btn btn-link btn-sm" href="@Model.Permalink()" id="report-permalink">Link to this report</a>
+    </div>
+</form>
+
+@if (Model.RangeProblem is not null)
+{
+    <div class="alert alert-danger" role="alert" id="range-problem">@Model.RangeProblem</div>
+}
+
+<div id="report-result">
+    @if (Model.FilterNotice is not null)
+    {
+        @* EC-5: the viewer is told the filter was narrowed; which id fell away, and whether it
+           ever existed, is deliberately not said. *@
+        <div class="alert alert-warning" role="status">@Model.FilterNotice</div>
+    }
+
+    @if (Model.Result is { } result && Model.Range is { } range)
+    {
+        @* Formatted invariantly, like every figure below it: the screen is written in English, and
+           SC-001 and SC-018 quote the hours and shares with a decimal point. *@
+        var rangeText = string.Format(
+            CultureInfo.InvariantCulture, "{0:d MMMM yyyy} to {1:d MMMM yyyy}", range.Begin, range.End);
+
+        if (result.IsEmpty)
+        {
+            @* FR-020: an explicit empty result naming the range, not an empty chart. *@
+            <div class="alert alert-secondary" role="status">
+                <p class="mb-0">
+                    No hours are logged between @range.Begin.ToString("yyyy-MM-dd") and
+                    @range.End.ToString("yyyy-MM-dd")@(Model.SelectedProjectIds.Count > 0 ? " for the selected projects" : null).
+                </p>
+                @if (Model.ViewerHasNoEntriesAtAll)
+                {
+                    @* EC-15. *@
+                    <p class="mb-0 mt-2 small">
+                        You have not logged any hours yet. If you cannot find the project you work on,
+                        ask a manager to assign you to it.
+                    </p>
+                }
+            </div>
+        }
+        else
+        {
+            <figure class="report-chart mb-4">
+                <figcaption class="text-muted small mb-2">
+                    @* NFR-006: the chart carries a text alternative naming the top slices and the
+                       total, so it is never the only way to read the result. *@
+                    @rangeText — @result.TotalHours.ToString("0.00", CultureInfo.InvariantCulture) hours across
+                    @result.Slices.Count project@(result.Slices.Count == 1 ? null : "s").
+                    Largest: @string.Join(", ", result.Slices.Take(3).Select(s => $"{s.Label} {s.Hours.ToString("0.00", CultureInfo.InvariantCulture)}")).
+                </figcaption>
+
+                @foreach (var slice in chartSlices)
+                {
+                    @* NFR-007: every bar carries its project and its hours on the chart itself,
+                       so the figures are legible without a pointing device and without colour. *@
+                    <div class="report-bar">
+                        <div class="report-bar-label" title="@slice.Label">@slice.Label</div>
+                        <div class="report-bar-track">
+                            <div class="report-bar-fill @(slice.IsOther ? "is-other" : null)"
+                                 style="width: @(((decimal)slice.Minutes * 100 / widest).ToString("0.##", CultureInfo.InvariantCulture))%"></div>
+                            <span class="report-bar-value">
+                                @slice.Hours.ToString("0.00", CultureInfo.InvariantCulture) h · @slice.ShareOf(result.TotalMinutes).ToString("0.0", CultureInfo.InvariantCulture)%
+                            </span>
+                        </div>
+                    </div>
+                }
+            </figure>
+
+            <table class="table table-sm align-middle">
+                @* FR-009 and FR-012: the table lists every project, including the ones the chart
+                   collected into "Other". *@
+                <caption class="visually-hidden">Hours per project, @rangeText</caption>
+                <thead>
+                    <tr>
+                        <th scope="col">Project</th>
+                        <th scope="col">Client</th>
+                        <th scope="col" class="text-end">Hours</th>
+                        <th scope="col" class="text-end">Share</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var slice in result.Slices)
+                    {
+                        <tr>
+                            <td>@slice.Label</td>
+                            <td class="text-muted">@(slice.Client ?? "—")</td>
+                            <td class="text-end font-monospace">@slice.Hours.ToString("0.00", CultureInfo.InvariantCulture)</td>
+                            <td class="text-end font-monospace">@slice.ShareOf(result.TotalMinutes).ToString("0.0", CultureInfo.InvariantCulture)%</td>
+                        </tr>
+                    }
+                </tbody>
+                <tfoot class="table-group-divider">
+                    <tr class="fw-semibold">
+                        <th scope="row" colspan="2">Total</th>
+                        @* FR-010: derived from the summed minutes, not from adding the rows above. *@
+                        <td class="text-end font-monospace">@result.TotalHours.ToString("0.00", CultureInfo.InvariantCulture)</td>
+                        <td class="text-end font-monospace">100.0%</td>
+                    </tr>
+                </tfoot>
+            </table>
+
+            @if (result.SharesAreRounded)
+            {
+                @* FR-023 and EC-10: the hours always reconcile; only the percentages may not. *@
+                <p class="text-muted small">
+                    Shares are rounded to one decimal place, so the column above may not read exactly
+                    100.0%. The hours reconcile exactly.
+                </p>
+            }
+
+            <p class="text-muted small">
+                Computed from the time entries as of now — nothing here is stored or cached, and
+                nothing on this screen changes an entry.
+            </p>
+        }
+    }
+</div>
+
+@section Scripts {
+    <script src="~/js/report.js" asp-append-version="true"></script>
+}

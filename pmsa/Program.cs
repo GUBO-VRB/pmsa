@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using pmsa.Data;
 using pmsa.Domain;
+using pmsa.Reporting;
 using pmsa.Security;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -16,6 +17,7 @@ builder.Services.AddDbContext<PmsaDbContext>(options =>
 
 builder.Services.Configure<PasswordHashingOptions>(builder.Configuration.GetSection("PasswordHashing"));
 builder.Services.Configure<SeedAdminOptions>(builder.Configuration.GetSection(SeedAdminOptions.SectionName));
+builder.Services.Configure<SampleDataOptions>(builder.Configuration.GetSection(SampleDataOptions.SectionName));
 
 builder.Services.AddSingleton<IPasswordHasher, Pbkdf2PasswordHasher>();
 builder.Services.AddSingleton<AdminInvariantLock>();
@@ -23,6 +25,11 @@ builder.Services.AddScoped<SignInService>();
 builder.Services.AddScoped<PasswordChangeService>();
 builder.Services.AddScoped<PeopleAdministrationService>();
 builder.Services.AddScoped<AdminSeeder>();
+builder.Services.AddScoped<SampleDataSeeder>();
+
+// Spec 012. Scoped, because it reads the request's DbContext; it holds no state of its own, which
+// is the point of the "nothing is stored" invariant.
+builder.Services.AddScoped<ProjectReportService>();
 
 builder.Services
     .AddAuthentication(AuthenticationDefaults.Scheme)
@@ -109,6 +116,14 @@ await using (var scope = app.Services.CreateAsyncScope())
 
     var seedOptions = scope.ServiceProvider.GetRequiredService<IOptions<SeedAdminOptions>>().Value;
     await scope.ServiceProvider.GetRequiredService<AdminSeeder>().SeedAsync(seedOptions);
+
+    // Demo projects, people and entries so the report has something to show before stories 001 and
+    // 008 exist. Development only, and off unless configuration turns it on.
+    if (app.Environment.IsDevelopment())
+    {
+        var sampleOptions = scope.ServiceProvider.GetRequiredService<IOptions<SampleDataOptions>>().Value;
+        await scope.ServiceProvider.GetRequiredService<SampleDataSeeder>().SeedAsync(sampleOptions);
+    }
 }
 
 app.Run();

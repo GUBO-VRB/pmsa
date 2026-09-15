@@ -19,7 +19,7 @@
 | Field           | Value                                                                    |
 | --------------- | ------------------------------------------------------------------------ |
 | Feature ID      | 012                                                                      |
-| Status          | Draft                                                                    |
+| Status          | Implemented                                                              |
 | Author          | gunther bogaert                                                          |
 | Created         | 2026-09-15                                                               |
 | Last updated    | 2026-09-15                                                               |

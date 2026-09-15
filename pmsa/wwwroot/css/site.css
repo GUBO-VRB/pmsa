@@ -29,3 +29,58 @@ body {
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
   text-align: start;
 }
+/* Project report (spec 012).
+   The bars are a reading aid, never the reading itself: every value is printed as text on the bar
+   (NFR-007) and repeated in the table (NFR-006), so colour carries no meaning of its own. */
+.report-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.35rem;
+}
+
+.report-bar-label {
+  flex: 0 0 11rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: end;
+  font-size: 0.875rem;
+}
+
+.report-bar-track {
+  position: relative;
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: var(--bs-tertiary-bg, #f8f9fa);
+  border-radius: 0.25rem;
+}
+
+.report-bar-fill {
+  height: 1.65rem;
+  min-width: 2px;
+  border-radius: 0.25rem;
+  background-color: #2b6cb0;
+}
+
+/* The collected tail of FR-012 is a different kind of thing from a project, so it is shaded
+   differently as well as labelled differently. */
+.report-bar-fill.is-other {
+  background-color: #94a3b8;
+}
+
+.report-bar-value {
+  font-size: 0.8125rem;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  color: var(--bs-secondary-color, #6c757d);
+}
+
+@media (prefers-contrast: more) {
+  .report-bar-fill {
+    outline: 1px solid currentColor;
+  }
+}
