@@ -11,8 +11,8 @@ A developer who works on several projects in the same day and logs hours as they
 ### Log my time
 | #   | Story                                                                        |
 | --- | ---------------------------------------------------------------------------- |
-| 001 | Type an entry manually with a begin hour, an end hour and a project          |
-| 002 | See today's entries in order with my running daily total                     |
+| 001 | Type an entry manually with a begin hour, an end hour and a project — *[spec 001](../specs/001-daily-time-entry.md)* |
+| 002 | See today's entries in order with my running daily total — *covered by [spec 001](../specs/001-daily-time-entry.md); same screen, same entity* |
 | 003 | Add a short note to an entry so I remember what I actually did               |
 
 ### Review & fix my week
@@ -20,12 +20,12 @@ A developer who works on several projects in the same day and logs hours as they
 | --- | ---------------------------------------------------------------------------- |
 | 004 | See my whole week laid out day by day, with daily totals and a week total     |
 | 005 | Edit or delete an entry I got wrong                                          |
-| 006 | Get warned about overlapping entries and about days that look empty or short |
+| 006 | Get warned about days that look empty or short                               |
 
 ### Manage projects, people & access
 | #   | Story                                                                                  |
 | --- | -------------------------------------------------------------------------------------- |
-| 007 | Sign in, with regular users and elevated users seeing different capabilities            |
+| 007 | Sign in, with regular users and elevated users seeing different capabilities — *[spec 007](../specs/007-authentication-and-roles.md)* |
 | 008 | Create and edit a project: name, client, colour, active or archived                     |
 | 009 | Assign which people can book hours to which project                                     |
 | 010 | Set a budget in hours on a project so consumption can be tracked against it             |
@@ -46,3 +46,5 @@ A developer who works on several projects in the same day and logs hours as they
 - The point of difference versus the tool being replaced is **follow-up**: activities 2 and 4 are where the value lives, not activity 1.
 - Reporting was explicitly asked to be multi-angle (user / project / timespan), so story 013 is a first-class story rather than a variation of 012.
 - Project budget + burn-down (010, 015) was deliberately pulled in as the ambitious piece — it is the story that makes the app worth opening when you are not logging hours.
+- **Overlaps are refused, not warned about.** Story 006 originally read "get warned about overlapping entries *and* about days that look empty or short". Spec 001 decided to refuse an overlapping entry outright at save time, so that half of 006 moved into 001 and story 006 now covers empty and short days only. The trade — a hard stop in the fastest path, in exchange for a week that can never double-book an hour — is recorded in spec 001, Section 9.2.
+- Story 007 was specified ahead of activity 1 because every other story is scoped to a person ("*my* entries, *my* week"), so entry ownership has to exist before 001 can be built.

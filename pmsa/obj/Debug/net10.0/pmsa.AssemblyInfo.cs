@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("pmsa")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+5bd8c97650ce7e775a54ddc1a0ec618ac5a9b420")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+1095d037c675464fbf3afc64d90f413d179cc2b4")]
 [assembly: System.Reflection.AssemblyProductAttribute("pmsa")]
 [assembly: System.Reflection.AssemblyTitleAttribute("pmsa")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
