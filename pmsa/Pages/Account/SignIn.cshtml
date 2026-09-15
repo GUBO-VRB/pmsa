@@ -1,0 +1,38 @@
+@page
+@model pmsa.Pages.Account.SignInModel
+@{
+    ViewData["Title"] = "Sign in";
+    Layout = "_SignedOutLayout";
+}
+
+<h1 class="h3 mb-3">Sign in</h1>
+
+<form method="post" asp-route-returnUrl="@Model.ReturnUrl">
+    <div asp-validation-summary="All" class="alert alert-danger" role="alert"
+         style="@(ViewData.ModelState.IsValid ? "display:none" : null)"></div>
+
+    <div class="mb-3">
+        <label asp-for="Input.Email" class="form-label"></label>
+        <input asp-for="Input.Email" class="form-control" autocomplete="username" autofocus
+               inputmode="email" maxlength="254" />
+        <span asp-validation-for="Input.Email" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Input.Password" class="form-label"></label>
+        <input asp-for="Input.Password" class="form-control" autocomplete="current-password" />
+        <span asp-validation-for="Input.Password" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Sign in</button>
+</form>
+
+@* No self-service registration and no password recovery: both are explicit non-goals of spec
+   007 (Section 1.3). An account comes from an Admin, and so does a forgotten password. *@
+<p class="text-muted mt-4 small">
+    Need an account, or forgotten your password? Ask an administrator.
+</p>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

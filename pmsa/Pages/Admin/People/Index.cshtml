@@ -1,0 +1,69 @@
+@page
+@model pmsa.Pages.Admin.People.IndexModel
+@{
+    ViewData["Title"] = "People";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3 mb-0">People</h1>
+    <a asp-page="Create" class="btn btn-primary">Add a person</a>
+</div>
+
+@if (Model.StatusMessage is not null)
+{
+    <div class="alert alert-success" role="status">@Model.StatusMessage</div>
+}
+@if (Model.ErrorMessage is not null)
+{
+    <div class="alert alert-danger" role="alert">@Model.ErrorMessage</div>
+}
+
+<table class="table align-middle">
+    <caption class="visually-hidden">Everyone with an account, active accounts first</caption>
+    <thead>
+        <tr>
+            <th scope="col">Name</th>
+            <th scope="col">Email address</th>
+            <th scope="col">Role</th>
+            <th scope="col">Status</th>
+            <th scope="col"><span class="visually-hidden">Actions</span></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var person in Model.People)
+        {
+            <tr class="@(person.IsActive ? null : "text-muted")">
+                <td>@person.FullName</td>
+                <td>@person.Email</td>
+                <td>@person.Role</td>
+                <td>
+                    @if (person.IsActive)
+                    {
+                        <span class="badge text-bg-success">Active</span>
+                    }
+                    else
+                    {
+                        <span class="badge text-bg-secondary">Deactivated</span>
+                    }
+                </td>
+                <td class="text-end">
+                    <a asp-page="Edit" asp-route-id="@person.Id" class="btn btn-sm btn-outline-secondary">Edit</a>
+                    @* Deactivation is a POST: it is a state change, and an anti-forgery token
+                       must stand behind it. *@
+                    <form method="post" class="d-inline"
+                          asp-page-handler="@(person.IsActive ? "Deactivate" : "Reactivate")"
+                          asp-route-id="@person.Id">
+                        <button type="submit" class="btn btn-sm @(person.IsActive ? "btn-outline-danger" : "btn-outline-success")">
+                            @(person.IsActive ? "Deactivate" : "Reactivate")
+                        </button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<p class="text-muted small">
+    Deactivating someone removes their access and keeps every hour they logged — reports and
+    budget burn-down are unaffected. Accounts are never deleted.
+</p>

@@ -1,0 +1,54 @@
+@page
+@using pmsa.Domain
+@model pmsa.Pages.Admin.People.CreateModel
+@{
+    ViewData["Title"] = "Add a person";
+}
+
+<h1 class="h3 mb-3">Add a person</h1>
+
+<form method="post" class="col-lg-6">
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"
+         style="@(ViewData.ModelState.IsValid ? "display:none" : null)"></div>
+
+    <div class="mb-3">
+        <label asp-for="Input.FullName" class="form-label"></label>
+        <input asp-for="Input.FullName" class="form-control" maxlength="200" autofocus />
+        <span asp-validation-for="Input.FullName" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Input.Email" class="form-label"></label>
+        <input asp-for="Input.Email" class="form-control" inputmode="email" maxlength="254" />
+        <div class="form-text">This is what they sign in with. It can never be reused by anyone else.</div>
+        <span asp-validation-for="Input.Email" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Input.Role" class="form-label"></label>
+        <select asp-for="Input.Role" class="form-select"
+                asp-items="Html.GetEnumSelectList<Role>()"></select>
+        <div class="form-text">
+            User: their own hours. Manager: projects, budgets and everyone's entries.
+            Admin: also accounts and roles.
+        </div>
+        <span asp-validation-for="Input.Role" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Input.Password" class="form-label"></label>
+        <input asp-for="Input.Password" class="form-control" autocomplete="new-password" />
+        <div class="form-text">
+            At least @PasswordPolicy.MinimumLength characters. Tell it to them directly — they
+            will be asked to replace it the first time they sign in.
+        </div>
+        <span asp-validation-for="Input.Password" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Create account</button>
+    <a asp-page="Index" class="btn btn-link">Cancel</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

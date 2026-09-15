@@ -1,0 +1,32 @@
+@*
+    A deliberately bare layout for the only page reachable without a session. It carries no
+    navigation, because there is nothing a signed-out visitor may reach (FR-004).
+*@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - pmsa</title>
+    <script type="importmap"></script>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/pmsa.styles.css" asp-append-version="true" />
+</head>
+<body class="bg-light">
+    <main role="main" class="container" style="max-width: 24rem;">
+        <h1 class="h4 text-center my-4">pmsa</h1>
+        <div class="card shadow-sm">
+            <div class="card-body">
+                @RenderBody()
+            </div>
+        </div>
+    </main>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

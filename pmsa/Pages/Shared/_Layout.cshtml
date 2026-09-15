@@ -1,4 +1,5 @@
-﻿<!DOCTYPE html>
+@using pmsa.Security
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -19,14 +20,39 @@
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                    @*
+                        FR-009: every item a role does not permit is absent, not disabled. This is
+                        a usability measure only — the refusal that actually protects anything is
+                        FR-010, enforced on the route (see AuthorizeFolder in Program.cs).
+                    *@
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/Index">Home</a>
+                            <a class="nav-link text-dark" asp-area="" asp-page="/Index">My hours</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/Privacy">Privacy</a>
-                        </li>
+                        @if (User.IsAdmin())
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-page="/Admin/People/Index">People</a>
+                            </li>
+                        }
                     </ul>
+
+                    @if (User.Identity?.IsAuthenticated is true)
+                    {
+                        <ul class="navbar-nav">
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-page="/Account/ChangePassword">
+                                    @User.GetFullName()
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                @* A POST, so that no link or prefetch can sign anyone out. *@
+                                <form method="post" asp-page="/Account/SignOut" class="d-inline">
+                                    <button type="submit" class="nav-link btn btn-link text-dark">Sign out</button>
+                                </form>
+                            </li>
+                        </ul>
+                    }
                 </div>
             </div>
         </nav>

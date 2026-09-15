@@ -2,16 +2,21 @@
 
 ## Risks
 
-<!-- Known technical risks, ordered by priority -->
-
 | Risk | Probability | Impact | Mitigation |
 | ---- | ----------- | ------ | ---------- |
-|      |             |        |            |
+| **Daily sign-in taxes the product's core promise.** A 12-hour non-persistent session means most people authenticate every morning, while the product exists to let developers log hours "in seconds". The friction lands squarely on the fastest path. | High — it happens daily by design | Medium — erodes the reason to adopt the tool | Accepted knowingly ([spec 007](../specs/007-authentication-and-roles.md) §9.2). Revisit if entry friction becomes a complaint: a longer lifetime, or a persistent "remember this device" cookie, are both reachable without changing the model. Decide this *before* story 001 ships to real users, when the complaint would be cheapest to act on. |
+| **No password recovery.** With no email infrastructure ([ADR-001](09-architecture-decisions.md)), a forgotten password or a 15-minute lockout is cleared only by an Admin, in person. | Medium | Medium — someone unreachable at 8 a.m. cannot log their day; worse if the last Admin is the one locked out | The last-Admin invariant guarantees an Admin account always *exists*, but not that a human can reach it. Keep more than one active Admin as an operational habit. Spec 007 open question 1 — password recovery needs a place in the story map before release. |
+| **The last-Admin guard assumes one process.** It is a `SemaphoreSlim` held across a transaction ([ADR-004](09-architecture-decisions.md)). Scaling out, or moving off SQLite, silently invalidates it — two instances would each hold their own semaphore and both demotions could pass. | Low today (SQLite implies a single writer) | High — the failure is silent and leaves the system unadministerable | The assumption is stated in ADR-004 and in Section 5. Any deployment change that introduces a second instance must replace it with a database-level guard first. |
+| **Holding password hashes at all.** ADR-001's consequence: pmsa is now a credential store, and a leaked database file is a credential-cracking target. | Low | High | PBKDF2 at 600 000 iterations with per-person salts makes offline cracking expensive (QS-04), and the stored format is versioned so the cost can be raised. The residual risk is inherent to local accounts and disappears only with an IdP. |
+| **The Manager role is enforced but unexercised.** `RequireManager` exists and is tested at the policy level, but nothing sits behind it until stories 009–011. A policy with no live consumer can drift out of correctness unnoticed. | Medium | Low | The policy has its own tests independent of any page. Stories 009–011 must attribute their pages to it rather than re-deriving a rule. |
 
 ## Technical Debt
 
-<!-- Known technical debt items -->
-
 | Item | Description | Effort | Priority |
 | ---- | ----------- | ------ | -------- |
-|      |             |        |          |
+| Arc42 sections 01, 02, 07 still empty | Introduction/goals, constraints, and deployment view were not written by this feature. Section 10 currently names quality goals Q1–Q4 that Section 1 does not yet list, and Section 3 refers to a deployment shape Section 7 does not describe. | Small | Medium |
+| No CI pipeline | The 75 acceptance tests exist but nothing runs them automatically. Spec 007 SUC-001 asks for SC-001..SC-021 to pass *in CI*, which is currently satisfied only by running `dotnet test` by hand. | Small | High |
+| No solution file | The repository has two projects (`pmsa`, `pmsa.Tests`) and no `.sln`, so `dotnet test` must be run from the test directory and `dotnet run` from the app directory. | Small | Low |
+| `obj/` build artifacts are tracked in git | `.gitignore` covers only `settings.local.json`. Build output and the local `pmsa.db` are candidates for commit. Cleaning this rewrites what is committed, so it needs a deliberate decision. | Small | Medium |
+| Sign-in outcome logging is not an audit trail | Causes of refusal are logged, and so are administrative actions, but as application log lines — not as a queryable, retained record. If "who deactivated whom, and when" ever needs answering after log rotation, it cannot be. | Medium | Low |
+| `SC-006`, `SC-012`, `SC-013` and half of `SC-017` are only partially covered | These scenarios reach into time entries, cross-person reports and project assignment, none of which exist yet. What is testable today is the rule they sit behind (the acting identity comes from the session; the Manager policy admits exactly Manager and Admin). | — | Revisit with stories 001, 011, 012 |

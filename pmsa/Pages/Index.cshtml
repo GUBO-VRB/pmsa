@@ -1,10 +1,28 @@
-﻿@page
+@page
+@using pmsa.Domain
 @model IndexModel
 @{
-    ViewData["Title"] = "Home page";
+    ViewData["Title"] = "My hours";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+@if (Model.StatusMessage is not null)
+{
+    <div class="alert alert-success" role="status">@Model.StatusMessage</div>
+}
+
+<h1 class="h3">Today</h1>
+
+@* SC-001: "the interface identifies her by name". *@
+<p>Signed in as <strong>@Model.FullName</strong> (@Model.Role).</p>
+
+<p class="text-muted">
+    Logging hours arrives with story 001. Every entry recorded from here on is attributed to this
+    account and to no other.
+</p>
+
+@if (Model.Role is Role.Admin)
+{
+    <p><a asp-page="/Admin/People/Index">Manage people and roles</a></p>
+}
+
+<p><a asp-page="/Account/ChangePassword">Change my password</a></p>

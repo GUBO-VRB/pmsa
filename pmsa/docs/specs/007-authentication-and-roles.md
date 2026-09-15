@@ -19,7 +19,7 @@
 | Field           | Value                                                            |
 | --------------- | ---------------------------------------------------------------- |
 | Feature ID      | 007                                                              |
-| Status          | Draft                                                            |
+| Status          | Implemented                                                      |
 | Author          | gunther bogaert                                                  |
 | Created         | 2026-09-15                                                       |
 | Last updated    | 2026-09-15                                                       |
@@ -497,7 +497,9 @@ in arc42 Section 10 and are referenced, not restated here.
 - Deployment must supply the seeded Admin's initial credentials (FR-020).
 - A persistence mechanism must be chosen before implementation; this spec assumes a
   store capable of a unique constraint on email and of serialising the last-Admin
-  check (EC-5), but does not require a specific technology.
+  check (EC-5), but does not require a specific technology. *Resolved at
+  implementation: EF Core over SQLite, with the last-Admin check serialised in
+  process — see [ADR-004](../architecture/09-architecture-decisions.md).*
 
 ### 9.2 Constraints
 
@@ -512,9 +514,10 @@ in arc42 Section 10 and are referenced, not restated here.
 
 ### 9.3 Architecture References
 
-All arc42 sections are currently empty templates. This feature is the first to require
-several of them, so the table below states what this spec expects each section to say
-once written.
+This feature was the first to require several arc42 sections; the table below states
+what each must carry. Sections 03, 04, 05, 06, 08, 09, 10, 11 and 12 have since been
+written — sections 01, 02 and 07 remain empty templates and are not this feature's to
+fill.
 
 | Arc42 Section                    | Relevance to This Feature                                                                                              |
 | -------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
@@ -533,7 +536,7 @@ once written.
 | #   | Question                                                                            | Owner | Status   | Resolution                                                                 |
 | --- | ----------------------------------------------------------------------------------- | ----- | -------- | -------------------------------------------------------------------------- |
 | 1   | Which story picks up password recovery, given that no one can currently be unlocked? | Product | Deferred | Out of scope here by decision; needs a place in the story map before release |
-| 2   | How are the seeded Admin's initial credentials supplied at deployment time?          | Architecture | Open | To be settled as an ADR in arc42 Section 09 alongside the deployment view    |
+| 2   | How are the seeded Admin's initial credentials supplied at deployment time?          | Architecture | Resolved | Configuration section `SeedAdmin` (`SeedAdmin__Email` / `SeedAdmin__Password` environment variables in production). No default credential ships. See [ADR-005](../architecture/09-architecture-decisions.md) |
 
 ---
 
