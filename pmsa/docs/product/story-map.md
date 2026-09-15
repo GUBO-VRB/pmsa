@@ -36,7 +36,7 @@ A developer who works on several projects in the same day and logs hours as they
 ### Report & visualize
 | #   | Story                                                                                       |
 | --- | ------------------------------------------------------------------------------------------- |
-| 012 | Pick a date range and see hours broken down per project as a chart — *[spec 012](../specs/012-date-range-project-report.md)* |
+| 012 | Pick a date range and see hours broken down per project as a chart — *[spec 012](../specs/012-date-range-project-report.md)* ✅ implemented |
 | 013 | Switch the angle of the same data: per person, per project, or per day — *[spec 013](../specs/013-report-pivot-dimensions.md)* |
 | 014 | Drill into a slice of a chart to see the underlying entries behind it — *[spec 014](../specs/014-chart-drill-through.md)* |
 | 015 | See a project burn-down: budgeted hours versus logged hours, percentage consumed, with a warning as it nears the budget — *[spec 015](../specs/015-project-burn-down.md)* |

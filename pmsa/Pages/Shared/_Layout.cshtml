@@ -29,6 +29,11 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-page="/Index">My hours</a>
                         </li>
+                        @* Spec 012, FR-001: the report is offered to every signed-in person. The
+                           role decides what the figures cover, not whether the screen exists. *@
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-page="/Reports/Projects">Reports</a>
+                        </li>
                         @if (User.IsAdmin())
                         {
                             <li class="nav-item">
