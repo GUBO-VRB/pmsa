@@ -92,7 +92,11 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapStaticAssets();
+// Static assets are endpoints too, so the fallback policy of FR-004 would otherwise demand a
+// session for the stylesheet the sign-in page is asking for. Stylesheets and scripts are not
+// the confidential material that policy exists to protect — pages are.
+app.MapStaticAssets().AllowAnonymous();
+
 app.MapRazorPages()
    .WithStaticAssets();
 
